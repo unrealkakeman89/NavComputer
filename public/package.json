@@ -1,0 +1,39 @@
+{
+  "name": "galaxy-pathfinder",
+  "version": "0.0.1",
+  "description": "galaxy pathfinder",
+  "main": "app.js",
+  "scripts": {
+    "build": "browserify app.js -o bundle.js",
+    "watch": "watchify app.js -o bundle.js",
+    "start": "beefy app.js:bundle.js --live"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/galaxy-pathfinder/galaxy-pathfinder.gitlab.io/"
+  },
+  "keywords": [
+    "route",
+    "hyperspace"
+  ],
+  "author": "sigon",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/galaxy-pathfinder/galaxy-pathfinder.gitlab.io/issues"
+  },
+  "homepage": "galaxy-pathfinder.gitlab.io",
+  "dependencies": {
+    "@turf/helpers": "^6.1.4",
+    "@turf/meta": "^6.0.2",
+    "bootstrap": "^4.5.0",
+    "geojson-path-finder": "^1.5.2",
+    "jquery": "^3.5.1",
+    "jquery-typeahead": "^2.11.1",
+    "leaflet": "^1.6.0"
+  },
+  "devDependencies": {
+    "beefy": "^2.1.8",
+    "browserify": "^16.5.1",
+    "watchify": "^3.11.1"
+  }
+}
