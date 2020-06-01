@@ -3,10 +3,11 @@ html, body, #container {
   width: 100%;
   overflow: hidden;
 }
-
-
 #map {
   width: auto;
   height: 100%;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
+.leaflet-container {
+    background: #565353;
+  }
