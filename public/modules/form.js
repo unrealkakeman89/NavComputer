@@ -36,6 +36,7 @@ function PlanetsAutocomplete (planets) {
           console.log(item)
         },
         onCancel: function (node, item, event) {
+          Router.removePlanetMarker(item.id)
           console.log(item.display + ' Removed!')
         }
       }
@@ -54,13 +55,10 @@ function PlanetsAutocomplete (planets) {
         // console.log('Typeahead Initiated on ' + node.selector)
       },
       onClick: function (node, a, item, event) {
-        console.log(item.id, item.display)
+        Router.addPlanetMarker(item.id, planets.features[item.id])
       },
       onSubmit: function (node, form, item, event) {
         event.preventDefault()
-        console.log('onSubmit override function triggered')
-        console.log(item[0].id, item[0].display)
-        console.log(item[1].id, item[1].display)
         var start = planets.features[item[0].id]
         var finish = planets.features[item[1].id]
         Router.createRoute(start, finish)

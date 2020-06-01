@@ -29,7 +29,8 @@
     "geojson-path-finder": "^1.5.2",
     "jquery": "^3.5.1",
     "jquery-typeahead": "^2.11.1",
-    "leaflet": "^1.6.0"
+    "leaflet": "^1.6.0",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "beefy": "^2.1.8",
