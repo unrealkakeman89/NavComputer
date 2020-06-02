@@ -8,7 +8,7 @@ var Router = require('./modules/hyperspace-router')
 var planets
 var hyperspaceSinglepart
 $.when(
-  $.get('data/hyperspace_singlepart.json', function (response) {
+  $.get('data/hyperspace_singlepart_new.json', function (response) {
     hyperspaceSinglepart = response
   }),
   $.get('data/planets.json', function (response) {
