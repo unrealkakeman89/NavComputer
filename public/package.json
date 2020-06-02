@@ -24,8 +24,10 @@
   "homepage": "galaxy-pathfinder.gitlab.io",
   "dependencies": {
     "@turf/bbox": "^6.0.1",
+    "@turf/distance": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@turf/meta": "^6.0.2",
+    "@turf/nearest-point": "^6.0.1",
     "bootstrap": "^4.5.0",
     "geojson-path-finder": "^1.5.2",
     "jquery": "^3.5.1",
