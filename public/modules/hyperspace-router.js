@@ -5,20 +5,19 @@ var nearestPoint = require('@turf/nearest-point').default
 var lineString = helpers.lineString
 var point = helpers.point
 var featureCollection = helpers.featureCollection
-// var distance = require('@turf/distance').default
+var distance = require('@turf/distance').default
 
 var PathFinder = require('geojson-path-finder')
+var _ = require('lodash')
 var findIndex = require('lodash/findIndex')
-// var util = require('./util')
-// var ItineraryBuilder = require('./itinerary-builder')
+var difference = require('lodash/difference')
 
 var Router = {
   pathfinder: {}, // pathfinder object
   _points: {}, // network vertices
-  path: {}, // pathfinder.path (route)
   pathBboxRectangeLayer: {},
   _route: {},
-  routePath: {},
+  routePath: {}, // linestring object name:path
   routePathLayer: {}, // leaflet path layer
   planetMarkerPathPoints: [], // planets markers
   map: {}, // leaflet map
@@ -39,22 +38,20 @@ var Router = {
     console.log('_points array lenght:')
     console.log(this._points.features.length)
   },
+  // {start}, {finish}: planet features
   createRoute: function (start, finish) {
+    this._route.name = { start: start.properties.name, finish: finish.properties.name }
     var waypoints = [start, finish]
-    console.log(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,waypoints');
-    console.log(waypoints);
     var pathfinder = this.pathFinder
     // check if input waypoints are included in the network vertices
     // if not, update the waypoint to the nearest point in the network vertices
     var actualWaypoints = waypoints.map(function (wp) {
-      // turf.nearestPoint(targetPoint, points)
-      var nearest = nearestPoint(wp, this._points)
+      var nearest = nearestPoint(wp, this._points) // turf.nearestPoint()
       // var lon = nearest.geometry.coordinates[0]
       // var lat = nearest.geometry.coordinates[1]
       // L.marker([lat, lon]).addTo(this.map).bindPopup('actualnearest waypoint').openPopup()
       return nearest
     }.bind(this))
-
     // create path with actualwaypoints (points in the vertices)
     var legs = actualWaypoints.map(function (wp, i, wps) {
       if (i > 0) {
@@ -64,30 +61,38 @@ var Router = {
     }).slice(1)
 
     // this.extentToWaypoints = L.geoJSON(coordinates).addTo(this.map)
-    this.path = legs[0]
-    // this.path = this.pathFinder.findPath(start, finish)
-    this.addRouteToMap(this.path)
+    this._route.path = legs[0]
 
-    // var totalTime = legs.reduce(function (sum, l) { return sum + l.weight }, 0)
-    // var totalDistance = legs.reduce(function (sum, l) {
-    //   var legDistance = l.path.reduce(function (d, c, i, cs) {
-    //     if (i > 0) {
-    //       return d + distance(point(cs[i - 1]), point(c)) * 1000
-    //     }
-    //     return d
-    //   }, 0)
-    //   return sum + legDistance
-    // }, 0)
-    // console.log('actualWaypoints');
-    // console.log(actualWaypoints);
-    // var waypointsLatLongArray = actualWaypoints.map(function (p) {
-    //   var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
-    //   return { latLng: latlong }
-    // })
-    // var inputWaypointsLatLongArray = waypoints.map(function (p) {
-    //   var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
-    //   return { latLng: latlong }
-    // })
+    // complete _route data:
+    var totalTime = legs.reduce(function (sum, l) { return sum + l.weight }, 0)
+    var totalDistance = legs.reduce(function (sum, l) {
+      var legDistance = l.path.reduce(function (d, c, i, cs) {
+        if (i > 0) {
+          return d + distance(point(cs[i - 1]), point(c)) * 1000
+        }
+        return d
+      }, 0)
+      return sum + legDistance
+    }, 0)
+    var waypointsLatLongArray = actualWaypoints.map(function (p) {
+      var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
+      return { latLng: latlong }
+    })
+    var inputWaypointsLatLongArray = waypoints.map(function (p) {
+      var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
+      return { latLng: latlong }
+    })
+
+    this._route.inputWaypoints = inputWaypointsLatLongArray
+    this._route.waypoints = waypointsLatLongArray
+    this._route.summary = {}
+    this._route.summary.totalTime = totalTime
+    this._route.summary.totalDistance = totalDistance
+    console.log('_route:')
+    console.log(this._route)
+
+    this.addRouteToMap(this._route.path)
+    this.addMissingSegments()
     // this._route = {
     //   name: '',
     //   waypoints: waypointsLatLongArray,
@@ -109,18 +114,50 @@ var Router = {
     this.routePathLayer = L.geoJSON(this.routePath).addTo(this.map)
     this.addBboxRectangle()
   },
+  // add missing segment, input waypoint {point} to {path init point}:
+  createStartLinestring: function (point) {
+    var startPathPoint = this._route.path.path[0]
+    var lonlats = [[point[1], point[0]], startPathPoint]
+    var line = lineString(lonlats, { name: 'missing segment' })
+    L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
+  },
+
+  // add missing segment, last path point to input waypoint
+  createFinishLinestring: function (point) {
+    var finishPathPoint = _.last(this._route.path.path)
+    var lonlats = [finishPathPoint, [point[1], point[0]]]
+    var line = lineString(lonlats, { name: 'missing segment' })
+    L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
+  },
+  addMissingSegments: function () {
+    var startSegment = []
+    var finishSegment = []
+    var route = this._route
+    // check if inputwaypoints are not actual waypoints:
+    startSegment = difference(route.inputWaypoints[0].latLng, route.waypoints[0].latLng)
+    finishSegment = difference(route.inputWaypoints[1].latLng, route.waypoints[1].latLng)
+    if (startSegment.length !== 0) {
+      this.createStartLinestring(startSegment)
+    }
+    if (finishSegment.length !== 0) {
+      this.createFinishLinestring(finishSegment)
+    }
+  },
+
   addPlanetMarker: function (id, feature) {
     var lon = feature.geometry.coordinates[0]
     var lat = feature.geometry.coordinates[1]
     var planetMarker = L.marker([lat, lon]).addTo(this.map).bindPopup(feature.properties.name).openPopup()
     this.planetMarkerPathPoints.push({ id: id, marker: planetMarker })
   },
+
   removePlanetMarker: function (id) {
     var markersArray = this.planetMarkerPathPoints
     var markerIndex = findIndex(markersArray, function (o) { return o.id === id })
     var marker = this.planetMarkerPathPoints[markerIndex].marker
     this.map.removeLayer(marker)
   },
+
   addBboxRectangle: function () {
     this.map.removeLayer(this.pathBboxRectangeLayer)
     var pathBbox = bbox(this.routePath)
@@ -130,8 +167,9 @@ var Router = {
     var rectangeProperties = { color: 'orange', weight: 1, fillOpacity: 0.03, interactive: false }
     this.pathBboxRectangeLayer = L.rectangle(bounds, rectangeProperties).addTo(this.map)
   },
+
   routeLayerStyle: {
-    missingRouteStyles: [
+    missingRoutes: [
       { color: 'black', opacity: 0.15, weight: 7 },
       { color: 'white', opacity: 0.6, weight: 4 },
       { color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12' }
