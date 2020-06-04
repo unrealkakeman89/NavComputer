@@ -48,7 +48,7 @@ function PlanetsAutocomplete (planets) {
       }
       return '<span class="list-group">' +
         '<span class="list-group-item">{{display}} <small style="color: ' + color + ';">({{region}})</small></span>' +
-    "</span>"
+    '</span>'
     },
     callback: {
       onInit: function (node) {
