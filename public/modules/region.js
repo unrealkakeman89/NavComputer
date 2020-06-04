@@ -1,17 +1,15 @@
 var L = require('leaflet')
-var _find = require('lodash/find')
 
 var Regions = {
 
   add: function (regions) {
-    console.log('add region')
-    console.log(regions)
     var regionsLayer = L.geoJSON(regions, {
       style: this.regionsStyle,
       onEachFeature: this.onEachFeature
     })
     return regionsLayer
   },
+
   regionsStyle: function (feature) {
     return {
       fillColor: regionColorDict[feature.properties.rid].color,
