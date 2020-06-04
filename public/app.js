@@ -4,8 +4,10 @@ var $ = require('jquery')
 
 var PlanetsAutocomplete = require('./modules/form')
 var Router = require('./modules/hyperspace-router')
+var Regions = require('./modules/region')
 
 var planets
+var regionsLayer
 var hyperspaceSinglepart
 $.when(
   $.get('data/hyperspace_singlepart_new.json', function (response) {
@@ -14,8 +16,11 @@ $.when(
   $.get('data/planets.json', function (response) {
     planets = response
     PlanetsAutocomplete(planets)
+  }),
+  $.get('data/region.json', function (response) {
+    regionsLayer = Regions.add(response)
+    console.log(regionsLayer);
   })
-
 ).then(function () {
   initialize(hyperspaceSinglepart)
 })
@@ -74,10 +79,12 @@ function initialize (network) {
       }
     }
   }).addTo(map)
+  regionsLayer.addTo(map).bringToBack()
 
   // add layer control
   var overlayLayers = {
-    Planets: planetLayer
+    Planets: planetLayer,
+    Regions: regionsLayer
   }
   L.control.layers(null, overlayLayers).addTo(map)
 }
