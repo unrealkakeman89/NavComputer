@@ -4,26 +4,28 @@ var $ = require('jquery')
 
 var PlanetsAutocomplete = require('./modules/form')
 var Router = require('./modules/hyperspace-router')
-var Regions = require('./modules/region')
+var Regions = require('./modules/region') // add region layer
+var Planets = require('./modules/planets') // add planets layer
 
-var planets
+var planetsLayer
 var regionsLayer
 var hyperspaceSinglepart
+
 $.when(
   $.get('data/hyperspace_singlepart_new.json', function (response) {
     hyperspaceSinglepart = response
   }),
   $.get('data/planets.json', function (response) {
-    planets = response
-    PlanetsAutocomplete(planets)
+    planetsLayer = Planets.add(response)
+    PlanetsAutocomplete(response)
   }),
   $.get('data/region.json', function (response) {
     regionsLayer = Regions.add(response)
-    console.log(regionsLayer);
   })
 ).then(function () {
   initialize(hyperspaceSinglepart)
 })
+
 var map = L.map('map')
 var style = {
   fillColor: 'blue',
@@ -43,47 +45,12 @@ function initialize (network) {
 
   var pathfinder = Router.createPathFinder(network, map)
 
-  // add planets layer
-  function getRadius (zoom) {
-    return zoom === 0 ? 4
-      : zoom === 1 ? 3
-        : zoom === 2 ? 2
-          : 1
-  }
-  function planetsStyle (feature) {
-    return {
-      radius: getRadius(feature.properties.zm),
-      fillColor: '#ff7800',
-      color: '#000',
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    }
-  }
-  function onEachFeature (feature, layer) {
-    if (feature.properties.name) {
-      layer.bindPopup(feature.properties.name)
-    }
-  }
-
-  // add planets layer to map
-  var planetLayer = L.geoJSON(planets, {
-    style: planetsStyle,
-    pointToLayer: function (feature, latlng) {
-      return L.circleMarker(latlng, planetsStyle)
-    },
-    onEachFeature: onEachFeature,
-    filter: function (feature, layer) {
-      if (feature.properties.canon === 1) {
-        return feature.properties.canon
-      }
-    }
-  }).addTo(map)
+  planetsLayer.addTo(map)
   regionsLayer.addTo(map).bringToBack()
 
   // add layer control
   var overlayLayers = {
-    Planets: planetLayer,
+    Planets: planetsLayer,
     Regions: regionsLayer
   }
   L.control.layers(null, overlayLayers).addTo(map)
