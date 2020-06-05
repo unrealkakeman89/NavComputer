@@ -1,4 +1,6 @@
 var L = require('leaflet')
+var $ = require('jquery')
+
 var helpers = require('@turf/helpers')
 var bbox = require('@turf/bbox').default
 var nearestPoint = require('@turf/nearest-point').default
@@ -9,6 +11,7 @@ var distance = require('@turf/distance').default
 var PathFinder = require('geojson-path-finder')
 // var _ = require('lodash')
 var last = require('lodash/last')
+var floor = require('lodash/floor')
 var findIndex = require('lodash/findIndex')
 var difference = require('lodash/difference')
 
@@ -99,6 +102,7 @@ var Router = {
     this.routePath = lineString(path.path, { name: 'path' })
     this.routePathLayer = L.geoJSON(this.routePath).addTo(this.map)
     this.addBboxRectangle()
+    this.modalShow()
   },
 
   // add missing segment, input waypoint {point} to {path init point}:
@@ -145,6 +149,17 @@ var Router = {
     var markerIndex = findIndex(markersArray, function (o) { return o.id === id })
     var marker = this.planetMarkerPathPoints[markerIndex].marker
     this.map.removeLayer(marker)
+  },
+
+  // modal route info
+  modalShow: function () {
+    var route = this._route
+    var totalDistance = floor(route.summary.totalDistance, 2)
+    $('#route-Modal').modal('show')
+    var title = 'ROUTE: ' + route.name.start + ' - ' + route.name.finish
+    var body = '<p>Distance: ' + totalDistance + ' parsecs</p>'
+    $('#route-Modal .modal-title').html(title)
+    $('#route-Modal .modal-body').html(body)
   },
 
   addBboxRectangle: function () {

@@ -1,6 +1,7 @@
 /* global */
 var L = require('leaflet')
 var $ = require('jquery')
+window.jQuery = window.$ = $
 
 var PlanetsAutocomplete = require('./modules/form')
 var Router = require('./modules/hyperspace-router')
@@ -10,6 +11,13 @@ var Planets = require('./modules/planets') // add planets layer
 var planetsLayer
 var regionsLayer
 var hyperspaceSinglepart
+
+$('#help-btn').click(function () {
+  console.log('click')
+  $('#help-Modal').modal('show')
+  $('.navbar-collapse.in').collapse('hide')
+  return false
+})
 
 $.when(
   $.get('data/hyperspace_singlepart_new.json', function (response) {
