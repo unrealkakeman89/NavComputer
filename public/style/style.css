@@ -12,5 +12,6 @@ html, body, #container {
     bottom: 70px;
 }
 .leaflet-container {
-  background-color: rgba(221, 221, 221, 0.01);
+  /* background-color: rgba(221, 221, 221, 0.01); */
+  background: #2a2929;
 }

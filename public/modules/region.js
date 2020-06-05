@@ -14,7 +14,7 @@ var Regions = {
     return {
       fillColor: regionColorDict[feature.properties.rid].color,
       color: 'white',
-      fillOpacity: 0.45,
+      fillOpacity: 0.85,
       weight: 1
     }
   },

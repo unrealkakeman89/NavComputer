@@ -7,7 +7,8 @@ var point = helpers.point
 var featureCollection = helpers.featureCollection
 var distance = require('@turf/distance').default
 var PathFinder = require('geojson-path-finder')
-var _ = require('lodash')
+// var _ = require('lodash')
+var last = require('lodash/last')
 var findIndex = require('lodash/findIndex')
 var difference = require('lodash/difference')
 
@@ -110,7 +111,7 @@ var Router = {
 
   // add missing segment, last path point to input waypoint
   createFinishLinestring: function (point) {
-    var finishPathPoint = _.last(this._route.path.path)
+    var finishPathPoint = last(this._route.path.path)
     var lonlats = [finishPathPoint, [point[1], point[0]]]
     var line = lineString(lonlats, { name: 'missing segment' })
     L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
