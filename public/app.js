@@ -27,6 +27,10 @@ $.when(
 })
 
 var map = L.map('map')
+
+var mapAttribution = 'Data from: <a href="http://www.swgalaxymap.com/">swgalaxymap.com</a>'
+map.attributionControl.addAttribution(mapAttribution)
+
 var style = {
   fillColor: 'blue',
   color: '#000',
@@ -53,5 +57,6 @@ function initialize (network) {
     Planets: planetsLayer,
     Regions: regionsLayer
   }
+
   L.control.layers(null, overlayLayers).addTo(map)
 }
