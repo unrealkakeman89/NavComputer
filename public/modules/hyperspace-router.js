@@ -7,7 +7,7 @@ var nearestPoint = require('@turf/nearest-point').default
 var lineString = helpers.lineString
 var point = helpers.point
 var featureCollection = helpers.featureCollection
-var distance = require('@turf/distance').default
+var distance = require('./utils').distance
 var PathFinder = require('geojson-path-finder')
 // var _ = require('lodash')
 var last = require('lodash/last')
@@ -64,18 +64,23 @@ var Router = {
 
     // this.extentToWaypoints = L.geoJSON(coordinates).addTo(this.map)
     this._route.path = legs[0]
-
+    console.log('legs')
+    console.log(legs)
     // complete _route data:
+    // reducer function: function (sum, l) { return sum + l.weight }, 0
     var totalTime = legs.reduce(function (sum, l) { return sum + l.weight }, 0)
+
     var totalDistance = legs.reduce(function (sum, l) {
+      // d distancia, c coordenadas,i contador, cs lista de coordenadas
       var legDistance = l.path.reduce(function (d, c, i, cs) {
         if (i > 0) {
-          return d + distance(point(cs[i - 1]), point(c)) * 1000
+          return d + distance(point(cs[i - 1]), point(c))
         }
         return d
       }, 0)
       return sum + legDistance
     }, 0)
+
     var waypointsLatLongArray = actualWaypoints.map(function (p) {
       var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
       return { latLng: latlong }
