@@ -28,7 +28,7 @@ $.when(
 
 var map = L.map('map')
 
-var mapAttribution = 'Data from: <a href="http://www.swgalaxymap.com/">swgalaxymap.com</a>'
+var mapAttribution = 'Data from: <a href="http://www.swgalaxymap.com/" title="Star Wars Galaxy Map">swgalaxymap.com</a>'
 map.attributionControl.addAttribution(mapAttribution)
 
 var style = {
