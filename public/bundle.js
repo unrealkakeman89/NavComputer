@@ -403,8 +403,8 @@ var Regions = {
   },
 
   onEachFeature: function (feature, layer) {
-    if (feature.properties.name) {
-      layer.bindPopup(feature.properties.name)
+    if (feature.properties.region) {
+      layer.bindPopup(feature.properties.region)
     }
   }
 }
