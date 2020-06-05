@@ -11,6 +11,6 @@ html, body, #container {
 .leaflet-bottom {
     bottom: 70px;
 }
-/* .leaflet-container {
-    background: #565353;
-  } */
+.leaflet-container {
+  background-color: rgba(221, 221, 221, 0.01);
+}

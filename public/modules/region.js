@@ -14,7 +14,7 @@ var Regions = {
     return {
       fillColor: regionColorDict[feature.properties.rid].color,
       color: 'white',
-      fillOpacity: 0.15,
+      fillOpacity: 0.45,
       weight: 1
     }
   },
@@ -28,17 +28,17 @@ var Regions = {
 
 module.exports = Regions
 
-// https://colorbrewer2.org/#type=sequential&scheme=Greys&n=9
+// https://colorbrewer2.org/#type=sequential&scheme=Purples&n=9
 var regionColorDict = [
   { rid: 0, color: '#ffffff', name: '' },
-  { rid: 1, color: '#ffffff', name: 'deep core' },
-  { rid: 2, color: '#f0f0f0', name: 'core' },
-  { rid: 3, color: '#d9d9d9', name: 'colonies' },
-  { rid: 4, color: '#bdbdbd', name: 'inner rim' },
-  { rid: 5, color: '#969696', name: 'expansion' },
-  { rid: 6, color: '#737373', name: 'mid rim' },
-  { rid: 7, color: '#525252', name: 'hutt' },
-  { rid: 8, color: '#252525', name: 'outer rim' },
-  { rid: 9, color: '#000000', name: 'wild' },
-  { rid: 10, color: '#000000', name: 'wild' }
+  { rid: 1, color: '#fcfbfd', name: 'deep core' },
+  { rid: 2, color: '#efedf5', name: 'core' },
+  { rid: 3, color: '#dadaeb', name: 'colonies' },
+  { rid: 4, color: '#bcbddc', name: 'inner rim' },
+  { rid: 5, color: '#9e9ac8', name: 'expansion' },
+  { rid: 6, color: '#807dba', name: 'mid rim' },
+  { rid: 7, color: '#6a51a3', name: 'hutt' },
+  { rid: 8, color: '#54278f', name: 'outer rim' },
+  { rid: 9, color: '#3f007d', name: 'wild' },
+  { rid: 10, color: '#3f007d', name: 'wild' }
 ]
