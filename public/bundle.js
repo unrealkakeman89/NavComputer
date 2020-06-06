@@ -58,8 +58,8 @@ function initialize (network) {
 
   var pathfinder = Router.createPathFinder(network, map)
 
-  planetsLayer.addTo(map)
   regionsLayer.addTo(map).bringToBack()
+  planetsLayer.addTo(map)
 
   // add layer control
   var overlayLayers = {
@@ -68,6 +68,10 @@ function initialize (network) {
   }
 
   L.control.layers(null, overlayLayers).addTo(map)
+
+  regionsLayer.on('add', function () {
+    regionsLayer.bringToBack()
+  })
 }
 
 },{"./modules/form":2,"./modules/hyperspace-router":3,"./modules/planets":4,"./modules/region":5,"jquery":24,"leaflet":25}],2:[function(require,module,exports){
@@ -362,12 +366,12 @@ var Planets = {
       fillOpacity: 0.8
     }
   },
-  getRadius: function (zoom) {
-    return zoom === 0 ? 4
-      : zoom === 1 ? 3
-        : zoom === 2 ? 2
-          : 1
-  },
+  // getRadius: function (zoom) {
+  //   return zoom === 0 ? 4
+  //     : zoom === 1 ? 3
+  //       : zoom === 2 ? 2
+  //         : 1
+  // },
   onEachFeature: function (feature, layer) {
     if (feature.properties.name) {
       layer.bindPopup(feature.properties.name)

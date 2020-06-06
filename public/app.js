@@ -57,8 +57,8 @@ function initialize (network) {
 
   var pathfinder = Router.createPathFinder(network, map)
 
-  planetsLayer.addTo(map)
   regionsLayer.addTo(map).bringToBack()
+  planetsLayer.addTo(map)
 
   // add layer control
   var overlayLayers = {
@@ -67,4 +67,8 @@ function initialize (network) {
   }
 
   L.control.layers(null, overlayLayers).addTo(map)
+
+  regionsLayer.on('add', function () {
+    regionsLayer.bringToBack()
+  })
 }
