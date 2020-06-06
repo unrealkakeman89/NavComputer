@@ -28,12 +28,12 @@ var Planets = {
       fillOpacity: 0.8
     }
   },
-  getRadius: function (zoom) {
-    return zoom === 0 ? 4
-      : zoom === 1 ? 3
-        : zoom === 2 ? 2
-          : 1
-  },
+  // getRadius: function (zoom) {
+  //   return zoom === 0 ? 4
+  //     : zoom === 1 ? 3
+  //       : zoom === 2 ? 2
+  //         : 1
+  // },
   onEachFeature: function (feature, layer) {
     if (feature.properties.name) {
       layer.bindPopup(feature.properties.name)
