@@ -1,7 +1,14 @@
 # galaxy-pathfinder.gitlab.io
 
-data source:
+Distance:
 
+* parsecs
+
+The map is supposed to be a galactic plane (not a projection), the coordinates must be x, y (Cartesian).  Distances are euclidean
+
+Data source:
+
+* [CARTO tables](https://hbernberg.carto.com/tables/hyperspace/public)
 * Henry Bernberg
-* EPSG:4326 - WGS 84 - Geographic
+* web Mercator (EPGS3857)  - Geographic
 * http://www.swgalaxymap.com/
