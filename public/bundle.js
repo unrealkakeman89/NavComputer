@@ -209,24 +209,8 @@ var Router = {
       return []
     }).slice(1)
 
-    // this.extentToWaypoints = L.geoJSON(coordinates).addTo(this.map)
-    this._route.path = legs[0]
-    console.log('legs')
-    console.log(legs)
-    // complete _route data:
-    // reducer function: function (sum, l) { return sum + l.weight }, 0
+    this._route.path = legs
     var totalTime = legs.reduce(function (sum, l) { return sum + l.weight }, 0)
-
-    var totalDistance = legs.reduce(function (sum, l) {
-      // d distancia, c coordenadas,i contador, cs lista de coordenadas
-      var legDistance = l.path.reduce(function (d, c, i, cs) {
-        if (i > 0) {
-          return d + distance(point(cs[i - 1]), point(c))
-        }
-        return d
-      }, 0)
-      return sum + legDistance
-    }, 0)
 
     var waypointsLatLongArray = actualWaypoints.map(function (p) {
       var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
@@ -241,12 +225,13 @@ var Router = {
     this._route.waypoints = waypointsLatLongArray
     this._route.summary = {}
     this._route.summary.totalTime = totalTime
-    this._route.summary.totalDistance = totalDistance
+
     console.log('_route:')
     console.log(this._route)
 
-    this.addRouteToMap(this._route.path)
     this.addMissingSegments()
+    this.calculateDistance()
+    this.addRouteToMap(this._route.path[0])
   },
 
   addRouteToMap: function (path) {
@@ -258,17 +243,21 @@ var Router = {
   },
 
   // add missing segment, input waypoint {point} to {path init point}:
-  createStartLinestring: function (point) {
-    var startPathPoint = this._route.path.path[0]
-    var lonlats = [[point[1], point[0]], startPathPoint]
+  createStartLinestring: function (featPoint) {
+    var startPathPoint = this._route.path[0].path[0]
+    var lonlats = [[featPoint[1], featPoint[0]], startPathPoint]
+    var legDistance = distance(point(startPathPoint), point([featPoint[1], featPoint[0]]))
+    this._route.path[1] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
     L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
   },
 
   // add missing segment, last path point to input waypoint
-  createFinishLinestring: function (point) {
-    var finishPathPoint = last(this._route.path.path)
-    var lonlats = [finishPathPoint, [point[1], point[0]]]
+  createFinishLinestring: function (featPoint) {
+    var finishPathPoint = last(this._route.path[0].path)
+    var lonlats = [finishPathPoint, [featPoint[1], featPoint[0]]]
+    var legDistance = distance(point([featPoint[1], featPoint[0]]), point(finishPathPoint))
+    this._route.path[2] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
     L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
   },
@@ -287,6 +276,21 @@ var Router = {
     if (finishSegment.length !== 0) {
       this.createFinishLinestring(finishSegment)
     }
+  },
+
+  calculateDistance: function () {
+    var legs = this._route.path
+    var totalDistance = legs.reduce(function (sum, l) {
+      // d distancia, c coordenadas,i contador, cs lista de coordenadas
+      var legDistance = l.path.reduce(function (d, c, i, cs) {
+        if (i > 0) {
+          return d + distance(point(cs[i - 1]), point(c))
+        }
+        return d
+      }, 0)
+      return sum + legDistance
+    }, 0)
+    this._route.summary.totalDistance = totalDistance
   },
 
   addPlanetMarker: function (id, feature) {
