@@ -21,7 +21,7 @@ var Router = {
   pathBboxRectangeLayer: {},
   _route: {},
   routePath: {}, // linestring object name:path
-  routePathLayer: {}, // leaflet path layer
+  routePathLayerGroup: {}, // leaflet path layer
   planetMarkerPathPoints: [], // planets markers
   map: {}, // leaflet map
   createPathFinder: function (network, map) {
@@ -88,9 +88,15 @@ var Router = {
   },
 
   addRouteToMap: function (path) {
-    this.map.removeLayer(this.routePathLayer)
+    this.map.removeLayer(this.routePathLayerGroup)
     this.routePath = lineString(path.path, { name: 'path' })
-    this.routePathLayer = L.geoJSON(this.routePath).addTo(this.map)
+
+    this.routePathLayer = L.geoJSON(this.routePath)
+    var routePathLayerGroup = L.layerGroup([this.routePathLayer])
+    routePathLayerGroup.addLayer(this._route.finishLineLayer)
+    routePathLayerGroup.addLayer(this._route.startLineLayer)
+    this.routePathLayerGroup = routePathLayerGroup
+    routePathLayerGroup.addTo(this.map)
     this.addBboxRectangle()
     this.modalShow()
   },
@@ -102,7 +108,7 @@ var Router = {
     var legDistance = distance(point(startPathPoint), point([featPoint[1], featPoint[0]]))
     this._route.path[1] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
-    L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
+    this._route.startLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
   // add missing segment, last path point to input waypoint
@@ -112,7 +118,7 @@ var Router = {
     var legDistance = distance(point([featPoint[1], featPoint[0]]), point(finishPathPoint))
     this._route.path[2] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
-    L.geoJSON(line, { color: 'gray', opacity: 0.65 }).addTo(this.map)
+    this._route.finishLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
   addMissingSegments: function () {
@@ -158,6 +164,7 @@ var Router = {
     var markerIndex = findIndex(markersArray, function (o) { return o.id === id })
     var marker = this.planetMarkerPathPoints[markerIndex].marker
     this.map.removeLayer(marker)
+    this.map.removeLayer(this.routePathLayerGroup)
   },
 
   // modal route info
