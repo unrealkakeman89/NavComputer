@@ -9,7 +9,8 @@ var point = helpers.point
 var featureCollection = helpers.featureCollection
 var distance = require('./utils').distance
 var PathFinder = require('geojson-path-finder')
-// var _ = require('lodash')
+var _ = require('lodash')
+var indexOf = require('lodash/indexOf')
 var last = require('lodash/last')
 var floor = require('lodash/floor')
 var findIndex = require('lodash/findIndex')
@@ -57,7 +58,13 @@ var Router = {
     // create path with actualwaypoints (points in the vertices)
     var legs = actualWaypoints.map(function (wp, i, wps) {
       if (i > 0) {
-        return pathfinder.findPath(wps[i - 1], wp)
+        var returnedPath = pathfinder.findPath(wps[i - 1], wp)
+        // bad hack, see issue #21
+        var isInitPlanet = indexOf(returnedPath.path[0], wps[0].geometry.coordinates[0])
+        if (isInitPlanet < 0) {
+          returnedPath.path.unshift(wps[0].geometry.coordinates)
+        }
+        return returnedPath
       }
       return []
     }).slice(1)
@@ -109,8 +116,6 @@ var Router = {
     var legDistance = distance(point(startPathPoint), point([featPoint[1], featPoint[0]]))
     this._route.path[1] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
-    console.log('line1');
-    console.log(line);
     this._route.startLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
@@ -121,8 +126,6 @@ var Router = {
     var legDistance = distance(point([featPoint[1], featPoint[0]]), point(finishPathPoint))
     this._route.path[2] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
-    console.log('line2');
-    console.log(line);
     this._route.finishLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
@@ -154,7 +157,6 @@ var Router = {
       }, 0)
       return sum + legDistance
     }, 0)
-    console.log('distance: ' + totalDistance)
     this._route.summary.totalDistance = totalDistance
   },
 
