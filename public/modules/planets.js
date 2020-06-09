@@ -36,7 +36,12 @@ var Planets = {
   // },
   onEachFeature: function (feature, layer) {
     if (feature.properties.name) {
-      layer.bindPopup(feature.properties.name)
+      var planetInfo = '<h4>' + feature.properties.name + '</h4>' +
+      '<p>GRID: ' + feature.properties.grid + '</p> ' +
+      '<p>COORDINATES: ' + feature.properties.x + ', ' + feature.properties.y + '</p>' +
+      '<p>REGION: ' + feature.properties.region + '</p>'
+
+      layer.bindPopup(planetInfo)
     }
   }
 }
