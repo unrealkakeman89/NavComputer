@@ -240,8 +240,9 @@ var Router = {
 
     this.routePathLayer = L.geoJSON(this.routePath)
     var routePathLayerGroup = L.layerGroup([this.routePathLayer])
-    routePathLayerGroup.addLayer(this._route.finishLineLayer)
-    routePathLayerGroup.addLayer(this._route.startLineLayer)
+
+    if (this._route.finishLineLayer) { routePathLayerGroup.addLayer(this._route.finishLineLayer) }
+    if (this._route.startLineLayer) { routePathLayerGroup.addLayer(this._route.startLineLayer) }
     this.routePathLayerGroup = routePathLayerGroup
     routePathLayerGroup.addTo(this.map)
     this.addBboxRectangle()
@@ -255,6 +256,8 @@ var Router = {
     var legDistance = distance(point(startPathPoint), point([featPoint[1], featPoint[0]]))
     this._route.path[1] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
+    console.log('line1');
+    console.log(line);
     this._route.startLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
@@ -265,6 +268,8 @@ var Router = {
     var legDistance = distance(point([featPoint[1], featPoint[0]]), point(finishPathPoint))
     this._route.path[2] = { path: lonlats, weight: legDistance }
     var line = lineString(lonlats, { name: 'missing segment' })
+    console.log('line2');
+    console.log(line);
     this._route.finishLineLayer = L.geoJSON(line, { color: 'gray', opacity: 0.65 })
   },
 
