@@ -83,9 +83,7 @@ var Router = {
     console.log(this._route)
 
     this.addMissingSegments()
-    console.log('86');
     this.calculateDistance()
-    console.log('88');
     this.addRouteToMap(this._route.path[0])
   },
 
@@ -151,7 +149,7 @@ var Router = {
       }, 0)
       return sum + legDistance
     }, 0)
-    console.log('distance: ' + totalDistance);
+    console.log('distance: ' + totalDistance)
     this._route.summary.totalDistance = totalDistance
   },
 
