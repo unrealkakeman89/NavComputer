@@ -9,7 +9,6 @@ var point = helpers.point
 var featureCollection = helpers.featureCollection
 var distance = require('./utils').distance
 var PathFinder = require('geojson-path-finder')
-var _ = require('lodash')
 var indexOf = require('lodash/indexOf')
 var last = require('lodash/last')
 var floor = require('lodash/floor')
