@@ -217,7 +217,6 @@ var Router = {
     }).slice(1)
 
     this._route.path = legs
-    var totalTime = legs.reduce(function (sum, l) { return sum + l.weight }, 0)
 
     var waypointsLatLongArray = actualWaypoints.map(function (p) {
       var latlong = [p.geometry.coordinates[1], p.geometry.coordinates[0]]
@@ -231,7 +230,6 @@ var Router = {
     this._route.inputWaypoints = inputWaypointsLatLongArray
     this._route.waypoints = waypointsLatLongArray
     this._route.summary = {}
-    this._route.summary.totalTime = totalTime
 
     console.log('_route:')
     console.log(this._route)
@@ -304,6 +302,9 @@ var Router = {
       }, 0)
       return sum + legDistance
     }, 0)
+    // 1 parsec --> 72,31 min
+    var totalTime = totalDistance * 72.31 // minutes
+    this._route.summary.totalTime = totalTime
     this._route.summary.totalDistance = totalDistance
   },
 
@@ -328,9 +329,24 @@ var Router = {
     var totalDistance = floor(route.summary.totalDistance, 2)
     $('#route-Modal').modal('show')
     var title = 'ROUTE: ' + route.name.start + ' - ' + route.name.finish
-    var body = '<p>Distance: ' + totalDistance + ' parsecs</p>'
+    var body = '<p>Distance: ' + totalDistance + ' parsecs</p>' +
+    '<p>Time: ' + this.displayedTravelTime(route.summary.totalTime) + '</p>'
     $('#route-Modal .modal-title').html(title)
     $('#route-Modal .modal-body').html(body)
+  },
+
+  displayedTravelTime: function (min) {
+    var seconds = Number(min * 60)
+    var d = Math.floor(seconds / (3600 * 24))
+    var h = Math.floor(seconds % (3600 * 24) / 3600)
+    var m = Math.floor(seconds % 3600 / 60)
+    // var s = Math.floor(seconds % 60);
+
+    var dDisplay = d > 0 ? d + (d === 1 ? ' day, ' : ' days, ') : ''
+    var hDisplay = h > 0 ? h + (h === 1 ? ' hour, ' : ' hours, ') : ''
+    var mDisplay = m > 0 ? m + (m === 1 ? ' minute, ' : ' minutes ') : ''
+    // var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    return dDisplay + hDisplay + mDisplay
   },
 
   addBboxRectangle: function () {
