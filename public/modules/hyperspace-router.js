@@ -157,6 +157,7 @@ var Router = {
     // 1 parsec --> 72,31 min
     var totalTime = totalDistance * 72.31 // minutes
     this._route.summary.totalTime = totalTime
+    totalDistance = floor(totalDistance, 2)
     this._route.summary.totalDistance = totalDistance
   },
 
@@ -178,7 +179,7 @@ var Router = {
   // modal route info
   modalShow: function () {
     var route = this._route
-    var totalDistance = floor(route.summary.totalDistance, 2)
+    var totalDistance = route.summary.totalDistance
     $('#route-Modal').modal('show')
     var title = 'ROUTE: ' + route.name.start + ' - ' + route.name.finish
     var body = '<p>Distance: ' + totalDistance + ' parsecs</p>' +
